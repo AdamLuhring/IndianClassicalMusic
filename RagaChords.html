@@ -1,0 +1,173 @@
+<html>
+<canvas id="theCanvas" width="500" height="100" style="border: 1px solid black"></canvas>
+<div id="theDiv"></div>
+<button id="theButton">RANDOMIZE</button>
+<script>
+function distance(x1,y1,x2,y2){
+    return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
+function numToNoteName(numIn){
+    switch(numIn){
+            case 0: return "C"; break;
+            case 1: return "C#/Db"; break;
+            case 2: return "D"; break;
+            case 3: return "D#/Eb"; break;
+            case 4: return "E"; break;
+            case 5: return "F"; break;
+            case 6: return "F#/Gb"; break;
+            case 7: return "G"; break;
+            case 8: return "G#/Ab"; break;
+            case 9: return "A"; break;
+            case 10: return "A#/Bb"; break;
+            case 11: return "B"; break;
+        }
+}
+function redraw(){
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,cnvs.width,cnvs.height);
+    ctx.strokeStyle = "black";
+    for(a=0;a<4;a++){
+        ctx.beginPath()
+        ctx.moveTo(a*100+100,0);
+        ctx.lineTo(a*100+100,cnvs.height);
+        ctx.stroke();
+    }
+    for(a=0;a<option.length;a++){
+        for(b=0;b<option[a].length;b++){
+            ctx.beginPath();
+            ctx.arc(option[a][b][0],option[a][b][1],radiusL,0,TAU);
+            ctx.stroke();
+        }
+    }
+    ctx.fillStyle = "black";
+    for(a=0;a<selection.length;a++){
+        ctx.beginPath();
+        ctx.arc(option[a][selection[a]][0],option[a][selection[a]][1],radiusS,0,TAU);
+        ctx.fill();
+    }
+}
+function relist(){
+    numList = [0];
+    switch(selection[1]){
+        case 0: numList.push(1); numList.push(2); break;
+        case 1: numList.push(1); numList.push(3); break;
+        case 2: numList.push(1); numList.push(4); break;
+        case 3: numList.push(2); numList.push(3); break;
+        case 4: numList.push(2); numList.push(4); break;
+        case 5: numList.push(3); numList.push(4); break;
+    }
+    switch(selection[2]){
+        case 0: numList.push(5); break;
+        case 1: numList.push(6); break;
+    }
+    numList.push(7);
+    switch(selection[4]){
+        case 0: numList.push(8); numList.push(9); break;
+        case 1: numList.push(8); numList.push(10); break;
+        case 2: numList.push(8); numList.push(11); break;
+        case 3: numList.push(9); numList.push(10); break;
+        case 4: numList.push(9); numList.push(11); break;
+        case 5: numList.push(10); numList.push(11); break;
+    }
+    noteNameList = "Notes in raga: ";
+    for(z=0;z<numList.length;z++){
+        noteNameList += numToNoteName(numList[z]);
+        if(z<numList.length-1){
+            noteNameList += ", ";
+        }
+    }
+    majorChordList = "Major chords: ";
+    atLeastOne = false;
+    for(z=0;z<12;z++){
+        if((numList.includes(z%12))&&(numList.includes((z+4)%12))&&(numList.includes((z+7)%12))){
+            majorChordList += numToNoteName(z) + ", ";
+            atLeastOne = true;
+        }
+    }
+    if(atLeastOne){
+        majorChordList = majorChordList.slice(0,majorChordList.length-2);
+    }
+    minorChordList = "Minor chords: ";
+    atLeastOne = false;
+    for(z=0;z<12;z++){
+        if((numList.includes(z%12))&&(numList.includes((z+3)%12))&&(numList.includes((z+7)%12))){
+            minorChordList += numToNoteName(z) + ", ";
+            atLeastOne = true;
+        }
+    }
+    if(atLeastOne){
+        minorChordList = minorChordList.slice(0,minorChordList.length-2);
+    }
+    majorSeventhChordList = "Major seventh chords: ";
+    atLeastOne = false;
+    for(z=0;z<12;z++){
+        if((numList.includes(z%12))&&(numList.includes((z+4)%12))&&(numList.includes((z+7)%12))&&(numList.includes((z+11)%12))){
+            majorSeventhChordList += numToNoteName(z) + ", ";
+            atLeastOne = true;
+        }
+    }
+    if(atLeastOne){
+        majorSeventhChordList = majorSeventhChordList.slice(0,majorSeventhChordList.length-2);
+    }
+    dominantSeventhChordList = "Dominant seventh chords: ";
+    atLeastOne = false;
+    for(z=0;z<12;z++){
+        if((numList.includes(z%12))&&(numList.includes((z+4)%12))&&(numList.includes((z+7)%12))&&(numList.includes((z+10)%12))){
+            dominantSeventhChordList += numToNoteName(z) + ", ";
+            atLeastOne = true;
+        }
+    }
+    if(atLeastOne){
+        dominantSeventhChordList = dominantSeventhChordList.slice(0,dominantSeventhChordList.length-2);
+    }
+    minorSeventhChordList = "Minor seventh chords: ";
+    atLeastOne = false;
+    for(z=0;z<12;z++){
+        if((numList.includes(z%12))&&(numList.includes((z+3)%12))&&(numList.includes((z+7)%12))&&(numList.includes((z+10)%12))){
+            minorSeventhChordList += numToNoteName(z) + ", ";
+            atLeastOne = true;
+        }
+    }
+    if(atLeastOne){
+        minorSeventhChordList = minorSeventhChordList.slice(0,minorSeventhChordList.length-2);
+    }
+    div.innerHTML = noteNameList
+    div.innerHTML += "<br>"+majorChordList+"<br>"+minorChordList
+    div.innerHTML += "<br>"+majorSeventhChordList+"<br>"+dominantSeventhChordList+"<br>"+minorSeventhChordList;
+}
+TAU = Math.PI*2;
+radiusS = 5;
+radiusL = 10;
+cnvs = document.getElementById("theCanvas");
+ctx = cnvs.getContext("2d");
+div = document.getElementById("theDiv");
+option = [
+    [[50,50]],
+    [[125,25],[150,25],[175,25],[137.5,50],[162.5,50],[150,75]],
+    [[250,25],[250,75]],
+    [[350,50]],
+    [[425,25],[450,25],[475,25],[437.5,50],[462.5,50],[450,75]]
+];
+selection = [0,0,0,0,0];
+redraw();
+relist();
+cnvs.onclick = function(e){
+    mouseX = e.clientX-cnvs.offsetLeft;
+    mouseY = e.clientY-cnvs.offsetTop;
+    for(a=0;a<option.length;a++){
+        for(b=0;b<option[a].length;b++){
+            if(distance(mouseX,mouseY,option[a][b][0],option[a][b][1])<radiusL){
+                selection[a] = b;
+                redraw();
+                relist();
+            }
+        }
+    }
+}
+document.getElementById("theButton").onclick = function(){
+    selection = [0,Math.floor(Math.random()*6),Math.floor(Math.random()*2),0,Math.floor(Math.random()*6)];
+    redraw();
+    relist();
+}
+</script>
+</html>
